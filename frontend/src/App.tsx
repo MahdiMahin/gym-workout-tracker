@@ -22,7 +22,8 @@ const navItems: NavItem[] = [
 const STORAGE_KEY = 'gwt_demo_workouts_v1'
 const EXERCISES = ['Bench Press', 'Incline Dumbbell Press', 'Squat', 'Deadlift', 'Lat Pulldown', 'Seated Row', 'Lateral Raises', 'Bicep Curl', 'Tricep Pushdown', 'Leg Press', 'Overhead Press', 'Cable Fly']
 const uid = () => typeof crypto !== 'undefined' && 'randomUUID' in crypto 
-  ? crypto.randomUUID()\n  : `id-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  ? crypto.randomUUID()
+  : `id-${Date.now()}-${Math.random().toString(36).slice(2)}`
 const n = (value: string) => Math.max(0, Number(value) || 0)
 
 function loadWorkouts(): Workout[] {
