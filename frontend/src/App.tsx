@@ -123,7 +123,7 @@ function App() {
   const [dark, setDark] = useState(true)
   const [toast, setToast] = useState('')
   useEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(workouts)), [workouts])
-  useEffect(() => document.documentElement.classList.toggle('light', !dark), [dark])
+  useEffect(() => { document.documentElement.classList.toggle('light', !dark) }, [dark])
   const sorted = useMemo(() => [...workouts].sort((a,b) => b.date.localeCompare(a.date)), [workouts])
   const totalVolume = workouts.reduce((sum, workout) => sum + workoutVolume(workout), 0)
   const allExercises = workouts.flatMap(w => w.exercises)
