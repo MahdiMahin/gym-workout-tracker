@@ -1,9 +1,10 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import App from './App'
 
 describe('frontend demo', () => {
   beforeEach(() => localStorage.clear())
+  afterEach(() => cleanup())
 
   it('shows the dashboard and workout stats', () => {
     render(<App />)
