@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import {
   Activity, ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, CalendarDays,
-  Check, ChevronDown, ChevronLeft, ChevronRight, Clock3, Dumbbell, Flame,
+  Check, ChevronDown, ChevronRight, Dumbbell, Flame,
   Home, ListChecks, Menu, Moon, Plus, Search, Settings2, Target, Trash2,
   TrendingUp, UserRound, Weight, X,
 } from 'lucide-react'
@@ -33,7 +34,7 @@ function loadWorkouts(): Workout[] {
     return seedWorkouts
   }
 }
-function IconButton({ children, onClick, title }: { children: React.ReactNode; onClick: () => void; title: string }) {
+function IconButton({ children, onClick, title }: { children: ReactNode; onClick: () => void; title: string }) {
   return <button className="icon-btn" type="button" title={title} aria-label={title} onClick={onClick}>{children}</button>
 }
 function WorkoutForm({ onSave, onCancel }: { onSave: (workout: Workout) => void; onCancel: () => void }) {
