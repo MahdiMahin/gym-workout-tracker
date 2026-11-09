@@ -1,0 +1,7 @@
+-- Local development seed. Runs only on `supabase db reset` / `supabase start`,
+-- never on the hosted project.
+--
+-- The global exercise library is NOT here: it is reference data the live app
+-- needs, so it lives in the initial migration.
+--
+-- Demo users and workouts can be added here later for local testing.
