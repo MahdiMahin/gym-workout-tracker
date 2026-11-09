@@ -1,0 +1,38 @@
+name: Supabase CI
+on:
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/supabase-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/supabase-ci.yml'
+jobs:
+  database:
+    name: Migrations, lint and database tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.1.0
+
+      # Starts a local Postgres in Docker and applies every file in supabase/migrations.
+      # A migration with a SQL error fails here.
+      - name: Start local database and apply migrations
+        run: supabase db start
+
+      - name: Lint database schema
+        run: supabase db lint --fail-on error
+
+      # Runs the pgTAP tests in supabase/tests/database (RLS, save_workout, views)
+      - name: Run database tests
+        run: supabase test db
+
+      - name: Stop local database
+        if: always()
+        run: supabase stop --no-backup

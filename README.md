@@ -59,6 +59,11 @@ Add details here for unit, integration, or end-to-end tests as they are added.
 
 Document the main directories and files here as the codebase grows.
 
+- `supabase/` — backend: database migrations, Row Level Security, pgTAP tests and
+  local Supabase config. See [supabase/README.md](supabase/README.md).
+- `.github/workflows/supabase-ci.yml` — applies migrations to a fresh database and
+  runs the database tests on every PR that touches `supabase/`.
+
 ## Configuration
 
 Document required environment variables and local configuration here. Do not
