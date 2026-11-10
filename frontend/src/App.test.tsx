@@ -25,4 +25,33 @@ describe('frontend demo', () => {
     fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
     expect(screen.getByRole('dialog', { name: 'Log a workout' })).toBeInTheDocument()
   })
+
+  it('rejects zero reps and displays a helpful error', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Reps' }), { target: { value: '0' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('positive whole-number reps')
+    expect(screen.getByRole('dialog', { name: 'Log a workout' })).toBeInTheDocument()
+  })
+
+  it('rejects negative weights', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Weight' }), { target: { value: '-20' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('weight of 0 lb or more')
+  })
+
+  it('allows zero weight for a bodyweight exercise', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Weight' }), { target: { value: '0' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(screen.queryByRole('dialog', { name: 'Log a workout' })).not.toBeInTheDocument()
+  })
+
 })
