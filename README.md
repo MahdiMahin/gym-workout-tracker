@@ -1,4 +1,5 @@
-[![CI](https://github.com/MahdiMahin/gym-workout-tracker/actions/workflows/blank.yml/badge.svg)](https://github.com/MahdiMahin/gym-workout-tracker/actions/workflows/blank.yml)
+[![Frontend CI](https://github.com/MahdiMahin/gym-workout-tracker/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/MahdiMahin/gym-workout-tracker/actions/workflows/frontend-ci.yml)
+[![Supabase CI](https://github.com/MahdiMahin/gym-workout-tracker/actions/workflows/supabase-ci.yml/badge.svg)](https://github.com/MahdiMahin/gym-workout-tracker/actions/workflows/supabase-ci.yml)
 
 # Gym Workout Tracker
 
