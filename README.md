@@ -19,42 +19,44 @@ the project takes shape.
 
 ## Prerequisites
 
-Add the tools and versions required to develop and run the project once the
-technology stack has been chosen.
-
-- **Runtime:** TODO
-- **Package manager:** TODO
-- **Additional requirements:** TODO
+- **Node.js:** 22
+- **Package manager:** npm
+- **Docker and Supabase CLI:** required to run the local database and database tests
 
 ## Getting started
 
 ### Setup
 
-Clone the repository and install its dependencies. Replace the placeholders
-below with the actual commands when the app's framework and package manager are
-in place.
+From the repository root, install the frontend dependencies:
 
 ```bash
-git clone https://github.com/MahdiMahin/gym-workout-tracker.git
-cd gym-workout-tracker
-# TODO: install dependencies
+cd frontend
+npm ci
 ```
 
 ### Run locally
 
+From `frontend/`, start the development server:
+
 ```bash
-# TODO: start the development server or application
+npm run dev
 ```
 
-Add the local URL and any required setup steps here when available.
+To start the local Supabase services, run `supabase start` from the repository root.
 
 ## Tests
 
+Run frontend tests from `frontend/`:
+
 ```bash
-# TODO: run the test suite
+npm run test
 ```
 
-Add details here for unit, integration, or end-to-end tests as they are added.
+Run database tests from the repository root:
+
+```bash
+supabase test db
+```
 
 ## Project structure
 
@@ -67,8 +69,14 @@ Document the main directories and files here as the codebase grows.
 
 ## Configuration
 
-Document required environment variables and local configuration here. Do not
-commit secrets; provide a safe example configuration file when needed.
+Copy the example environment file:
+
+```bash
+cp frontend/.env.example frontend/.env.local
+```
+
+Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` as needed. Never
+commit secrets, service-role keys, or database passwords.
 
 ## Contributing
 
