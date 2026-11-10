@@ -44,12 +44,13 @@ function WorkoutForm({ onSave, onCancel }: { onSave: (workout: Workout) => void;
   const [date, setDate] = useState(todayISO())
   const [duration, setDuration] = useState('45')
   const [notes, setNotes] = useState('')
+  const [formError, setFormError] = useState('')
   const [exercises, setExercises] = useState<Exercise[]>([
     { id: uid(), name: 'Bench Press', sets: [{ id: uid(), reps: 8, weight: 135 }] },
   ])
   const patchSet = (exerciseId: string, setId: string, field: 'reps' | 'weight', value: string) =>
     setExercises(previous => previous.map(ex => ex.id === exerciseId ? {
-      ...ex, sets: ex.sets.map(set => set.id === setId ? { ...set, [field]: n(value) } : set),
+      ...ex, sets: ex.sets.map(set => set.id === setId ? { ...set, [field]: value.trim() === '' ? NaN : Number(value) } : set),
     } : ex))
   const addSet = (exerciseId: string) => setExercises(previous => previous.map(ex => ex.id === exerciseId ? {
     ...ex, sets: [...ex.sets, { id: uid(), reps: 8, weight: 0 }],
@@ -58,9 +59,21 @@ function WorkoutForm({ onSave, onCancel }: { onSave: (workout: Workout) => void;
     <div className="modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) onCancel() }}>
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div className="modal-heading"><div><span className="eyebrow">WORKOUT BUILDER</span><h2 id="modal-title">Log a workout</h2></div><IconButton title="Close" onClick={onCancel}><X size={19}/></IconButton></div>
-        <form onSubmit={event => {
+        <form noValidate onSubmit={event => {
           event.preventDefault()
-          if (!name.trim() || !date || exercises.some(ex => !ex.name.trim() || ex.sets.length === 0)) return
+          if (!name.trim() || !date) {
+            setFormError('Enter a workout name and date.')
+            return
+          }
+          if (exercises.length === 0 || exercises.some(ex => !ex.name.trim() || ex.sets.length === 0)) {
+            setFormError('Add at least one exercise with a set.')
+            return
+          }
+          if (exercises.some(ex => ex.sets.some(set => !Number.isInteger(set.reps) || set.reps <= 0 || set.reps > 10000 || !Number.isFinite(set.weight) || set.weight < 0 || set.weight > 100000))) {
+            setFormError('Each set needs positive whole-number reps and a weight of 0 lb or more.')
+            return
+          }
+          setFormError('')
           onSave({ id: uid(), name: name.trim(), date, duration: n(duration), notes, exercises })
         }}>
           <div className="form-grid">
@@ -80,14 +93,15 @@ function WorkoutForm({ onSave, onCancel }: { onSave: (workout: Workout) => void;
               <div className="set-head"><span>SET</span><span>REPS</span><span>WEIGHT (LB)</span><span></span></div>
               {exercise.sets.map((set, setIndex) => <div className="set-row" key={set.id}>
                 <span className="set-number">{setIndex + 1}</span>
-                <input aria-label="Reps" type="number" min="0" max="10000" value={set.reps} onChange={e => patchSet(exercise.id, set.id, 'reps', e.target.value)}/>
-                <input aria-label="Weight" type="number" min="0" max="100000" value={set.weight} onChange={e => patchSet(exercise.id, set.id, 'weight', e.target.value)}/>
+                <input aria-label="Reps" type="number" min="1" step="1" max="10000" value={Number.isNaN(set.reps) ? '' : set.reps} onChange={e => patchSet(exercise.id, set.id, 'reps', e.target.value)}/>
+                <input aria-label="Weight" type="number" min="0" step="any" max="100000" value={Number.isNaN(set.weight) ? '' : set.weight} onChange={e => patchSet(exercise.id, set.id, 'weight', e.target.value)}/>
                 <IconButton title="Remove set" onClick={() => setExercises(prev => prev.map(ex => ex.id === exercise.id ? { ...ex, sets: ex.sets.filter(item => item.id !== set.id) } : ex))}><X size={16}/></IconButton>
               </div>)}
               <button className="add-set" type="button" onClick={() => addSet(exercise.id)}><Plus size={15}/> Add set</button>
             </div>
           ))}
           <label className="field">Notes (optional)<textarea rows={2} value={notes} onChange={e => setNotes(e.target.value)} placeholder="How did the session feel?"/></label>
+          {formError && <p role="alert" className="form-error">{formError}</p>}
           <div className="modal-footer"><button className="btn btn-ghost" type="button" onClick={onCancel}>Cancel</button><button className="btn btn-primary" type="submit" disabled={exercises.length === 0}><Check size={17}/> Save workout</button></div>
         </form>
       </div>
