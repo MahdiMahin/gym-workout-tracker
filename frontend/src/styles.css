@@ -23,3 +23,6 @@
 .account-text strong,.account-text span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .profile-level{color:#a8c99d;font-size:12px;font-weight:700;margin-top:6px}
 .profile-logout{margin-left:auto}
+
+/* Workout form validation feedback */
+.form-error { color: #dc2626; font-size: 0.875rem; margin: 0.75rem 0; }

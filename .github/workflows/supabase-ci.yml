@@ -1,14 +1,9 @@
 name: Supabase CI
 on:
   pull_request:
-    paths:
-      - 'supabase/**'
-      - '.github/workflows/supabase-ci.yml'
+    branches: [main]
   push:
     branches: [main]
-    paths:
-      - 'supabase/**'
-      - '.github/workflows/supabase-ci.yml'
 jobs:
   database:
     name: Migrations, lint and database tests
