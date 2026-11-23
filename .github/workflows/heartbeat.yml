@@ -7,7 +7,7 @@ name: API Heartbeat
 
 on:
   schedule:
-    - cron: '7,22,37,52 * * * *' # every 15 min, off the top of the hour when GitHub is busiest
+    - cron: '8,23,38,53 * * * *' # every 15 min, off the top of the hour when GitHub is busiest
   workflow_dispatch:
   pull_request:
     branches: [main]
