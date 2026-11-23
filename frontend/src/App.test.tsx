@@ -1,5 +1,3 @@
-// Frontend workout validation tests
-
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import App from './App'
@@ -54,6 +52,45 @@ describe('frontend demo', () => {
     fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Weight' }), { target: { value: '0' } })
     fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
     expect(screen.queryByRole('dialog', { name: 'Log a workout' })).not.toBeInTheDocument()
+  })
+
+  it('rejects a blank reps field', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Reps' }), { target: { value: '' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('positive whole-number reps')
+  })
+
+  it('rejects a blank weight field', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Weight' }), { target: { value: '' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('weight of 0 lb or more')
+  })
+
+  it('rejects decimal reps', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Reps' }), { target: { value: '2.5' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('positive whole-number reps')
+  })
+
+  it('clears validation error after fixing an invalid input', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    const reps = within(dialog).getByRole('spinbutton', { name: 'Reps' })
+    fireEvent.change(reps, { target: { value: '0' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toBeInTheDocument()
+    fireEvent.change(reps, { target: { value: '8' } })
+    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument()
   })
 
 })
