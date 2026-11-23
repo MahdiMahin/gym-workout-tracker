@@ -3,3 +3,5 @@ timestamp_utc,run_id,check,http_status,latency_ms,ok,detail
 2026-11-23T00:07:38Z,45086912285,rest_exercises,200,598,true,rows=15
 2026-11-23T02:12:32Z,45098858275,auth,200,1345,true,
 2026-11-23T02:12:32Z,45098858275,rest_exercises,200,627,true,rows=15
+2026-11-23T03:04:32Z,45103774969,auth,200,584,true,
+2026-11-23T03:04:32Z,45103774969,rest_exercises,200,335,true,rows=15
