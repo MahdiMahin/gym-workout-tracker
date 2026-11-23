@@ -54,7 +54,7 @@ request() {
 
 # 1. Sign in. The payload goes through stdin so the password is not in the process list.
 token=""
-payload="$(jq -n --arg e "$HEARTBEAT_EMAIL" --arg p "$HEARTBEAT_PASSWORD" '{email: $e, password: $p}')"
+payload="$(jq -n '{email: env.HEARTBEAT_EMAIL, password: env.HEARTBEAT_PASSWORD}')"
 request -X POST "$base/auth/v1/token?grant_type=password" \
   -H "apikey: $SUPABASE_KEY" -H 'Content-Type: application/json' --data-binary @- <<< "$payload"
 if [ "$status" = 200 ]; then
