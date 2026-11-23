@@ -10,11 +10,13 @@ The backend uses a [Supabase](https://supabase.com) project for the Postgres dat
 supabase/
 ├── config.toml                 # Local stack settings (Supabase CLI)
 ├── migrations/                 # Every schema change, applied in filename order
-│   └── 20261109000000_initial_schema.sql
+│   ├── 20261109000000_initial_schema.sql
+│   └── 20261109200517_user_auth_profile.sql
 ├── tests/database/             # pgTAP tests, run with `supabase test db`
 │   ├── 01_schema.test.sql      # tables, RLS enabled, views, functions, seed data
 │   ├── 02_rls.test.sql         # users can only see their own data
-│   └── 03_save_workout.test.sql# save_workout RPC + stats views
+│   ├── 03_save_workout.test.sql# save_workout RPC + stats views
+│   └── 04_auth_profile.test.sql# sign-up trigger, usernames, profile updates
 └── seed.sql                    # Local-only demo data (empty for now)
 ```
 
@@ -57,6 +59,32 @@ const { data: workoutId, error } = await supabase.rpc('save_workout', {
   },
 })
 ```
+
+## Registration, login and profile
+
+Accounts live in Supabase Auth (`auth.users`); a `profiles` row is created automatically on sign-up.
+
+```ts
+// Registration: check the username first (works before the user exists)
+const { data: free } = await supabase.rpc('is_username_available', { p_username: 'bob_lifts' })
+
+await supabase.auth.signUp({
+  email, password,
+  options: { data: { display_name: 'Bob', username: 'bob_lifts' } },
+})
+
+// Login / logout
+await supabase.auth.signInWithPassword({ email, password })
+await supabase.auth.signOut()
+
+// Profile page
+const { data: profile } = await supabase.from('profiles').select('*').single()
+await supabase.from('profiles').update({ bio, experience_level, weight_unit }).eq('id', profile.id)
+```
+
+- `username`: 3-20 chars, lowercase letters, numbers and `_`, unique. If the sign-up username is invalid or was taken in the meantime, sign-up still succeeds and `username` stays empty for the user to set on the profile page.
+- `display_name` is cut to 60 chars, `bio` is up to 280 chars, `experience_level` is `beginner`, `intermediate` or `advanced`.
+- Password length and email confirmation for the hosted project are set in the dashboard (Authentication → Providers → Email), not in `config.toml`.
 
 ## Security
 

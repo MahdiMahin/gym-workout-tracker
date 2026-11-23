@@ -1,0 +1,92 @@
+name: API Heartbeat
+
+# Probes the live Supabase API every 15 minutes and records availability and
+# latency (our SLIs) to metrics/heartbeat.csv on the `metrics` branch.
+# Pull requests that change the heartbeat run a dry run: probe only, nothing recorded.
+# Runbook, SLOs and reporting: monitoring/README.md
+
+on:
+  schedule:
+    - cron: '8,23,38,53 * * * *' # every 15 min, off the top of the hour when GitHub is busiest
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/heartbeat.yml
+      - monitoring/**
+
+permissions:
+  contents: write # push results to the metrics branch
+
+concurrency:
+  group: heartbeat
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      HEARTBEAT_EMAIL: ${{ secrets.HEARTBEAT_EMAIL }}
+      HEARTBEAT_PASSWORD: ${{ secrets.HEARTBEAT_PASSWORD }}
+      RECORD: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out metrics branch
+        if: env.RECORD == 'true'
+        run: |
+          if git ls-remote --exit-code --heads origin metrics > /dev/null; then
+            git fetch --depth=1 origin metrics
+            git worktree add metrics-branch FETCH_HEAD
+          else
+            git worktree add --detach metrics-branch
+            git -C metrics-branch checkout --orphan metrics-new
+            git -C metrics-branch rm -rfq .
+          fi
+
+      - name: Probe API
+        id: probe
+        run: |
+          if [ "$RECORD" = true ]; then out=metrics-branch/metrics/heartbeat.csv; else out="$RUNNER_TEMP/heartbeat.csv"; fi
+          mkdir -p "$(dirname "$out")"
+          echo "out=$out" >> "$GITHUB_OUTPUT"
+          bash monitoring/heartbeat.sh "$out" || echo "failed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Write run summary
+        if: always()
+        env:
+          OUT: ${{ steps.probe.outputs.out }}
+        run: |
+          {
+            echo "### API heartbeat"
+            echo
+            echo "| Check | HTTP | Latency (ms) | OK | Detail |"
+            echo "|---|---|---|---|---|"
+            if [ -f "$OUT" ]; then
+              grep ",${GITHUB_RUN_ID}," "$OUT" | awk -F, '{ printf "| %s | %s | %s | %s | %s |\n", $3, $4, $5, $6, $7 }'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Record results
+        if: env.RECORD == 'true'
+        working-directory: metrics-branch
+        run: |
+          [ -f metrics/heartbeat.csv ] || exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add metrics/heartbeat.csv
+          git commit -qm "heartbeat: run ${GITHUB_RUN_ID}"
+          if ! git push -q origin HEAD:refs/heads/metrics; then
+            git fetch --depth=20 origin metrics
+            git rebase FETCH_HEAD
+            git push -q origin HEAD:refs/heads/metrics
+          fi
+
+      - name: Fail if a check failed
+        if: steps.probe.outputs.failed == 'true'
+        run: |
+          echo "::error::API heartbeat failed. See the run summary above and monitoring/README.md."
+          exit 1
