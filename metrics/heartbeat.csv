@@ -11,3 +11,5 @@ timestamp_utc,run_id,check,http_status,latency_ms,ok,detail
 2026-11-23T17:55:52Z,45232879963,rest_exercises,200,703,true,rows=15
 2026-11-23T20:04:43Z,45255542462,auth,200,937,true,
 2026-11-23T20:04:43Z,45255542462,rest_exercises,200,382,true,rows=15
+2026-11-23T20:36:28Z,45261096625,auth,200,768,true,
+2026-11-23T20:36:28Z,45261096625,rest_exercises,200,472,true,rows=15
