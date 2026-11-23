@@ -11,12 +11,14 @@ supabase/
 ├── config.toml                 # Local stack settings (Supabase CLI)
 ├── migrations/                 # Every schema change, applied in filename order
 │   ├── 20261109000000_initial_schema.sql
-│   └── 20261109200517_user_auth_profile.sql
+│   ├── 20261109200517_user_auth_profile.sql
+│   └── 20261124000000_frontend_supabase_support.sql
 ├── tests/database/             # pgTAP tests, run with `supabase test db`
 │   ├── 01_schema.test.sql      # tables, RLS enabled, views, functions, seed data
 │   ├── 02_rls.test.sql         # users can only see their own data
 │   ├── 03_save_workout.test.sql# save_workout RPC + stats views
-│   └── 04_auth_profile.test.sql# sign-up trigger, usernames, profile updates
+│   ├── 04_auth_profile.test.sql# sign-up trigger, usernames, profile updates
+│   └── 05_workout_updates.test.sql # exercises by name, update_workout, PR sets, validation
 └── seed.sql                    # Local-only demo data (empty for now)
 ```
 
@@ -48,6 +50,7 @@ auth.users ──1:1── profiles            (display name, lb/kg, theme)
 
 - `workout_summaries`: one row per workout with `exercise_count`, `set_count`, `total_volume`. Same numbers as `workoutVolume()` / `workoutSetCount()` in the frontend; warm-up sets are excluded.
 - `personal_records`: per user and exercise, `max_weight`, `best_set_volume`, `est_one_rep_max` (Epley).
+- `personal_record_sets`: per user and exercise, the PR set itself: `weight`, `reps`, `achieved_on`, `workout_id`. Heaviest weight wins, ties go to more reps, then the earliest date (same rule as `personalRecords()` in `trainingInsights.ts`).
 
 **RPC**: `save_workout(payload jsonb)` saves a workout with all its exercises and sets in one transaction:
 
@@ -58,7 +61,15 @@ const { data: workoutId, error } = await supabase.rpc('save_workout', {
     exercises: [{ exercise_id: '<uuid>', sets: [{ reps: 8, weight: 135 }] }],
   },
 })
+
+// Edit a logged workout: replaces its name/date/duration/notes, exercises and sets
+await supabase.rpc('update_workout', { p_workout_id: workoutId, payload: { /* same shape */ } })
 ```
+
+- Each exercise needs `exercise_id` **or** `name`. A name is matched case-insensitively against the user's own exercises first, then the global library; an unknown name becomes a custom exercise for the user. This is what lets the frontend's name-based `Workout` objects (and existing localStorage data) be saved as they are.
+- `duration` may be a decimal; it is rounded to whole minutes.
+- Every exercise needs at least one set. Reps must be a whole number 1-10000 and weight 0-99999.99; otherwise the RPC raises a `23514` error with a message naming the exercise and set.
+- An `exercise_id` must be a global exercise or the user's own; another user's custom exercise is rejected (also enforced by RLS on `workout_exercises`, `template_exercises` and `goals`).
 
 ## Registration, login and profile
 
