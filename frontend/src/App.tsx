@@ -54,10 +54,12 @@ function WorkoutForm({ onSave, onCancel }: { onSave: (workout: Workout) => void;
   const [exercises, setExercises] = useState<Exercise[]>([
     { id: uid(), name: 'Bench Press', sets: [{ id: uid(), reps: 8, weight: 135 }] },
   ])
-  const patchSet = (exerciseId: string, setId: string, field: 'reps' | 'weight', value: string) =>
+  const patchSet = (exerciseId: string, setId: string, field: 'reps' | 'weight', value: string) => {
+    setFormError('')
     setExercises(previous => previous.map(ex => ex.id === exerciseId ? {
       ...ex, sets: ex.sets.map(set => set.id === setId ? { ...set, [field]: value.trim() === '' ? NaN : Number(value) } : set),
     } : ex))
+  }
   const addSet = (exerciseId: string) => setExercises(previous => previous.map(ex => ex.id === exerciseId ? {
     ...ex, sets: [...ex.sets, { id: uid(), reps: 8, weight: 0 }],
   } : ex))
@@ -83,9 +85,9 @@ function WorkoutForm({ onSave, onCancel }: { onSave: (workout: Workout) => void;
           onSave({ id: uid(), name: name.trim(), date, duration: n(duration), notes, exercises })
         }}>
           <div className="form-grid">
-            <label className="field">Workout name<input required value={name} maxLength={80} onChange={e => setName(e.target.value)}/></label>
-            <label className="field">Date<input required type="date" value={date} onChange={e => setDate(e.target.value)}/></label>
-            <label className="field">Duration (minutes)<input type="number" min="0" max="1000" value={duration} onChange={e => setDuration(e.target.value)}/></label>
+            <label className="field">Workout name<input required value={name} maxLength={80} onChange={e => { setName(e.target.value); setFormError('') }}/></label>
+            <label className="field">Date<input required type="date" value={date} onChange={e => { setDate(e.target.value); setFormError('') }}/></label>
+            <label className="field">Duration (minutes)<input type="number" min="0" max="1000" value={duration} onChange={e => { setDuration(e.target.value); setFormError('') }}/></label>
           </div>
           <div className="form-section-head"><h3>Exercises</h3><button className="text-action" type="button" onClick={() => setExercises(prev => [...prev, { id: uid(), name: 'Lat Pulldown', sets: [{ id: uid(), reps: 10, weight: 0 }] }])}><Plus size={16}/> Add exercise</button></div>
           {exercises.map((exercise, index) => (
@@ -106,8 +108,8 @@ function WorkoutForm({ onSave, onCancel }: { onSave: (workout: Workout) => void;
               <button className="add-set" type="button" onClick={() => addSet(exercise.id)}><Plus size={15}/> Add set</button>
             </div>
           ))}
-          <label className="field">Notes (optional)<textarea rows={2} value={notes} onChange={e => setNotes(e.target.value)} placeholder="How did the session feel?"/></label>
-          {formError && <p role="alert" className="form-error">{formError}</p>}
+          <label className="field">Notes (optional)<textarea rows={2} value={notes} onChange={e => { setNotes(e.target.value); setFormError('') }} placeholder="How did the session feel?"/></label>
+          {formError && <p role="alert" className="form-error" aria-live="polite">{formError}</p>}
           <div className="modal-footer"><button className="btn btn-ghost" type="button" onClick={onCancel}>Cancel</button><button className="btn btn-primary" type="submit" disabled={exercises.length === 0}><Check size={17}/> Save workout</button></div>
         </form>
       </div>
