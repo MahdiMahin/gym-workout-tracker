@@ -13,6 +13,7 @@ import { AuthProvider } from './lib/AuthProvider'
 import { useAuth } from './lib/auth-context'
 import { initials } from './lib/username'
 import { AuthScreen } from './AuthScreen'
+import { RestTimer } from './RestTimer'
 
 type Page = 'dashboard' | 'workouts' | 'history' | 'progress' | 'profile'
 type NavItem = { id: Page; label: string; icon: typeof Home }
@@ -87,6 +88,7 @@ function WorkoutForm({ onSave, onCancel }: { onSave: (workout: Workout) => void;
             <label className="field">Date<input required type="date" value={date} onChange={e => setDate(e.target.value)}/></label>
             <label className="field">Duration (minutes)<input type="number" min="0" max="1000" value={duration} onChange={e => setDuration(e.target.value)}/></label>
           </div>
+          <RestTimer />
           <div className="form-section-head"><h3>Exercises</h3><button className="text-action" type="button" onClick={() => setExercises(prev => [...prev, { id: uid(), name: 'Lat Pulldown', sets: [{ id: uid(), reps: 10, weight: 0 }] }])}><Plus size={16}/> Add exercise</button></div>
           {exercises.map((exercise, index) => (
             <div className="exercise-editor" key={exercise.id}>
