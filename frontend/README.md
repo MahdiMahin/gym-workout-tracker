@@ -21,7 +21,7 @@ npm run lint
 npm run test
 npm run build
 ```
-
+## base
 ## Supabase handoff
 
 Copy `.env.example` to `.env.local` and supply the project URL and **publishable** key after the backend team finalizes table schemas and Row Level Security. The client is prepared in `src/lib/supabase.ts`, but this demo intentionally does not send writes to Supabase. Do **not** expose service-role/secret keys in the browser or commit credentials.
