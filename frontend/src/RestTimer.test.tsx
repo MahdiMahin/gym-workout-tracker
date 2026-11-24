@@ -2,7 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RestTimer } from './RestTimer'
 
-beforeEach(() => vi.useFakeTimers())
+beforeEach(() => { vi.useFakeTimers() })
 afterEach(() => {
   cleanup()
   vi.useRealTimers()
@@ -11,7 +11,7 @@ afterEach(() => {
 describe('RestTimer', () => {
   const time = () => screen.getByRole('timer')
   const click = (name: string) => fireEvent.click(screen.getByRole('button', { name, exact: true }))
-  const advance = (ms: number) => act(() => { vi.advanceTimersByTime(ms) })
+  const advance = (ms: number) => { act(() => { vi.advanceTimersByTime(ms) }) }
 
   it('selects a rest duration', () => {
     render(<RestTimer />)
