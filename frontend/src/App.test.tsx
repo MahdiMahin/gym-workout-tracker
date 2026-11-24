@@ -56,4 +56,33 @@ describe('frontend demo', () => {
     expect(screen.queryByRole('dialog', { name: 'Log a workout' })).not.toBeInTheDocument()
   })
 
+  it('rejects a blank reps field instead of saving it as 0', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Reps' }), { target: { value: '' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('positive whole-number reps')
+    expect(screen.getByRole('dialog', { name: 'Log a workout' })).toBeInTheDocument()
+  })
+
+  it('rejects decimal reps', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Reps' }), { target: { value: '2.5' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('positive whole-number reps')
+    expect(screen.getByRole('dialog', { name: 'Log a workout' })).toBeInTheDocument()
+  })
+
+  it('rejects a blank weight field', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /Log workout/i }))
+    const dialog = screen.getByRole('dialog', { name: 'Log a workout' })
+    fireEvent.change(within(dialog).getByRole('spinbutton', { name: 'Weight' }), { target: { value: '' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: /Save workout/i }))
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('weight of 0 lb or more')
+    expect(screen.getByRole('dialog', { name: 'Log a workout' })).toBeInTheDocument()
+  })
 })
