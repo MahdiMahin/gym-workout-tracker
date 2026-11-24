@@ -33,7 +33,7 @@ jobs:
       HEARTBEAT_PASSWORD: ${{ secrets.HEARTBEAT_PASSWORD }}
       RECORD: ${{ github.event_name != 'pull_request' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Check out metrics branch
         if: env.RECORD == 'true'
