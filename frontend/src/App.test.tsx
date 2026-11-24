@@ -13,6 +13,7 @@ describe('frontend demo', () => {
     expect(screen.getByText('Your fitness at a glance')).toBeInTheDocument()
     expect(screen.getByText('Total Workouts')).toBeInTheDocument()
     expect(screen.getByText('Recent workouts')).toBeInTheDocument()
+    expect(screen.getByText('Workout consistency')).toBeInTheDocument()
   })
 
   it('can navigate to workout history', () => {

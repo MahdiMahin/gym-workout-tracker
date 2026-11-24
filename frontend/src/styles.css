@@ -26,3 +26,28 @@
 
 /* Workout form validation feedback */
 .form-error { color: #dc2626; font-size: 0.875rem; margin: 0.75rem 0; }
+
+/* ---- Workout consistency ---- */
+.consistency-panel{margin-bottom:20px}
+.goal-stepper{display:flex;align-items:center;gap:8px;border:1px solid #354036;background:#202920;border-radius:9px;padding:4px;color:#a8c99d;font-size:11px;white-space:nowrap}
+.goal-stepper strong{color:#d4eec4;font-size:13px}
+.goal-stepper button{border:0;background:#2b3a2b;color:#b9ec9f;border-radius:6px;width:26px;height:26px;display:grid;place-items:center}
+.consistency-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
+.consistency-stats>div{background:#1b2027;border:1px solid #2a3139;border-radius:10px;padding:13px 14px}
+.consistency-stats span{display:block;font-size:10px;color:#87929c;margin-bottom:7px}
+.consistency-stats strong{font-size:20px;letter-spacing:-.4px;display:flex;align-items:center;gap:6px}
+.streak-on{color:#f0a35e}
+.week-strip{display:flex;flex-direction:column;gap:9px}
+.week-bars{position:relative;height:120px;display:flex;align-items:flex-end;gap:10px;border-bottom:1px solid #394047;padding:0 4px}
+.week-bar{flex:1;max-width:46px;margin:0 auto;background:#33414a;border-radius:6px 6px 0 0;transition:height .3s}
+.week-bar.met{background:#3d6040}
+.week-bar.current{outline:1px dashed #6f8f6a;outline-offset:2px}
+.week-bar.met.current{background:linear-gradient(#b6f090,#79bd65)}
+.week-goal-line{position:absolute;left:0;right:0;border-top:1px dashed #8fb07f;opacity:.7;pointer-events:none}
+.week-labels{display:flex;gap:10px;padding:0 4px}
+.week-labels span{flex:1;text-align:center;font-size:9px;color:#849198;white-space:nowrap}
+.light .consistency-stats>div{background:#f5f8f4;border-color:#dce5da}
+.light .goal-stepper{background:#e8f5e6;border-color:#b7d5b5;color:#33623a}
+.light .goal-stepper strong{color:#1f4a24}
+.light .goal-stepper button{background:#d5ead2;color:#295b2b}
+@media(max-width:620px){.consistency-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.week-bars,.week-labels{gap:5px}.week-labels span{font-size:8px}}
