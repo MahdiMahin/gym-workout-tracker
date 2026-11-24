@@ -21,7 +21,35 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
-      - name: Unit tests
-        run: npm run test
+      - name: Unit tests with coverage
+        run: |
+          npm run test:coverage
+          node --input-type=module <<'NODE'
+          import { appendFileSync, readFileSync } from 'node:fs'
+
+          const { total } = JSON.parse(readFileSync('coverage/coverage-summary.json', 'utf8'))
+          const rows = [
+            ['Statements', total.statements.pct],
+            ['Branches', total.branches.pct],
+            ['Functions', total.functions.pct],
+            ['Lines', total.lines.pct],
+          ]
+          const table = [
+            '### Frontend coverage',
+            '',
+            '| Metric | Coverage |',
+            '| --- | ---: |',
+            ...rows.map(([metric, percent]) => `| ${metric} | ${percent}% |`),
+            '',
+          ].join('\n')
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, table)
+          NODE
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/
+          if-no-files-found: warn
       - name: Production build
         run: npm run build
